@@ -8,6 +8,8 @@ export default function ThreeBackground() {
     const container = mountRef.current;
     if (!container) return;
 
+    const isMobile = window.innerWidth < 768;
+
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0xf3f4f7, 0.011);
 
@@ -19,20 +21,23 @@ export default function ThreeBackground() {
     );
     camera.position.z = 42;
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isMobile });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Cap pixel ratio harder on mobile — full retina density on a live
+    // particle graph is a real battery/heat cost for little visible gain
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.3 : 2));
     container.appendChild(renderer.domElement);
 
     // ------------------------------------------------------------------
     // PARTICLE NETWORK — nodes + dynamically drawn connecting lines.
     // This is the signature element: a live data-graph rather than
     // floating decorative shapes, which reads as literally "tech/AI"
-    // instead of jewelry.
+    // instead of jewelry. Node count and link search are both trimmed
+    // on mobile since the O(n^2) proximity check runs every frame.
     // ------------------------------------------------------------------
-    const NODE_COUNT = 90;
-    const SPREAD = 46;
-    const LINK_DIST = 13;
+    const NODE_COUNT = isMobile ? 40 : 90;
+    const SPREAD = isMobile ? 30 : 46;
+    const LINK_DIST = isMobile ? 11 : 13;
 
     const nodeColor = new THREE.Color(0x3a5cff);
     const nodeColorAlt = new THREE.Color(0x7c3aed);
@@ -127,7 +132,7 @@ export default function ThreeBackground() {
       transparent: true,
       opacity: 0.35,
     });
-    const globeGeo = new THREE.IcosahedronGeometry(9, 2);
+    const globeGeo = new THREE.IcosahedronGeometry(9, isMobile ? 1 : 2);
     const globe = new THREE.Mesh(globeGeo, globeMaterial);
     globe.position.set(26, 6, -20);
     scene.add(globe);

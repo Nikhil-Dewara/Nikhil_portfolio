@@ -1386,12 +1386,30 @@ body::after {
    RESPONSIVE BREAKPOINTS
    ========================================================================== */
 
+/* Touch devices have no mouse — the follow-cursor dot/glow would otherwise
+   get stuck wherever the last touch was, so hide them outright */
+@media (hover: none), (pointer: coarse) {
+  .custom-cursor-dot,
+  .custom-cursor-glow {
+    display: none;
+  }
+}
+
+/* Tablet */
 @media (max-width: 992px) {
   .hero-grid {
     grid-template-columns: 1fr;
   }
+  .hero-avatar-wrapper {
+    order: -1;
+    margin-bottom: 8px;
+  }
+  .hero-avatar-card {
+    max-width: 280px;
+    height: 320px;
+  }
   .hero-name {
-    font-size: 3.6rem;
+    font-size: 3.4rem;
   }
   .about-grid {
     grid-template-columns: 1fr;
@@ -1404,24 +1422,119 @@ body::after {
   }
 }
 
+/* Large phone */
 @media (max-width: 640px) {
   .content-wrapper {
-    padding: 100px 16px 120px;
+    padding: 96px 16px 130px;
   }
   .hero-name {
-    font-size: 2.7rem;
+    font-size: 2.6rem;
+  }
+  .role-ticker-box {
+    font-size: 1.15rem;
+    flex-wrap: wrap;
+  }
+  .hero-bio {
+    font-size: 1rem;
   }
   .section-title {
-    font-size: 2rem;
+    font-size: 1.7rem;
+  }
+  .footer-title {
+    font-size: 2.1rem;
+  }
+  .hero-buttons {
+    gap: 10px;
+  }
+  .btn {
+    padding: 11px 18px;
+    font-size: 0.88rem;
   }
   .exp-card {
-    min-width: 300px;
+    min-width: 86vw;
+    padding: 24px;
   }
   .standard-project-grid {
     grid-template-columns: 1fr;
   }
   .hero-stats-row {
     flex-direction: column;
+  }
+  .contact-glass-card {
+    padding: 36px 20px;
+  }
+
+  /* Dynamic island: drop the status line and shrink so it fits a 375px
+     screen without crowding the notch/status bar */
+  .dynamic-island-container {
+    top: 14px;
+    width: calc(100% - 24px);
+    max-width: 340px;
+  }
+  .dynamic-island {
+    width: 100%;
+    justify-content: space-between;
+    padding: 7px 14px;
+  }
+  .brand-status {
+    display: none;
+  }
+  .island-audio-widget {
+    display: none;
+  }
+
+  /* Dock: tighten spacing so all 6 items fit comfortably */
+  .glass-dock-wrapper {
+    bottom: 16px;
+    width: calc(100% - 24px);
+    max-width: 400px;
+  }
+  .glass-dock {
+    width: 100%;
+    justify-content: space-between;
+    padding: 7px 10px;
+    gap: 6px;
+  }
+  .dock-item {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+  }
+  .dock-item svg {
+    width: 16px;
+    height: 16px;
+  }
+  .dock-item::after {
+    display: none;
+  }
+}
+
+/* Small phone */
+@media (max-width: 400px) {
+  .hero-name {
+    font-size: 2.2rem;
+  }
+  .hero-avatar-card {
+    max-width: 220px;
+    height: 260px;
+  }
+  .badge-pill {
+    font-size: 0.68rem;
+  }
+  .status-pill {
+    font-size: 0.72rem;
+    padding: 5px 11px;
+  }
+  .contact-item-btn {
+    padding: 13px 14px;
+    gap: 12px;
+  }
+  .footer-title {
+    font-size: 1.8rem;
+  }
+  .dock-item {
+    width: 34px;
+    height: 34px;
   }
 }
 
