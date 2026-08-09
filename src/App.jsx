@@ -3,12 +3,13 @@ import confetti from "canvas-confetti";
 import {
   Download,
   Mail,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   BadgeCheck,
   Phone,
+  GraduationCap,
+  Award,
 } from "lucide-react";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import ThreeBackground from "./components/ThreeBackground";
@@ -17,59 +18,94 @@ import DynamicIsland from "./components/DynamicIsland";
 import GlassDock from "./components/GlassDock";
 import "./App.css";
 
-const ROLES = ["Full Stack Developer", "Python Engineer", "AI Builder"];
+const ROLES = ["Software Engineer", "Python Full-Stack Developer", "AI Builder"];
 
-// STRICT TECH STACK ACCORDING TO USER REQUIREMENTS
-const STRICT_SKILLS = [
-  "Python",
-  "Django",
-  "React.js",
-  "SQL",
-  "SQLite",
-  "FastAPI",
-  "OpenAI API",
-  "LLM",
-  "LangChain",
-  "RAG",
+// Grouped exactly as on the resume — Programming & Frameworks / Cloud &
+// Databases / AI Technologies — instead of one flat undifferentiated list
+const SKILL_GROUPS = [
+  {
+    label: "Programming & Frameworks",
+    color: "blue",
+    items: ["Python", "JavaScript", "Django", "FastAPI", "React.js", "Tailwind CSS", "Micro Frontends", "REST APIs"],
+  },
+  {
+    label: "Cloud & Databases",
+    color: "teal",
+    items: ["AWS", "Azure", "CI/CD", "Microsoft SQL Server", "MySQL", "SQLite"],
+  },
+  {
+    label: "AI Technologies",
+    color: "violet",
+    items: ["Agno", "Agentic AI", "RAG", "LangChain", "LLMs", "OpenAI API", "Prompt Engineering"],
+  },
 ];
 
 const EXPERIENCE = [
   {
     role: "Software Engineer",
-    company: "AceNet Consulting",
+    company: "AceNet Consulting Pvt Ltd",
     dates: "Aug 2025 — Present",
     tag: "CURRENT",
-    logoUrl: "/acenet-logo.png",
-    logoFallback: "AC",
+    logoUrl: "/loader.png",
     bullets: [
-      "Designed and built REST APIs in FastAPI powering internal business tools and client-facing features, owning business logic and data validation end to end.",
-      "Built reusable, modular React.js components for the E2O (Thejo) client project, improving UI consistency and long-term maintainability.",
-      "Took ownership of critical client-raised production issues on the BG application, working directly with client teams to diagnose and resolve.",
-      "Implemented complex Microsoft SQL Server schema migrations to support evolving business requirements without disrupting production.",
+      "Developed backend services and REST APIs using Python (FastAPI) to support internal tools and client-facing features, handling business logic and data validation.",
+      "Built reusable React.js components for the E2O (Thejo) client project, improving UI/UX modularity and consistency across the application.",
+      "Resolved critical client-raised production tickets on the BG application, working directly with the client team to troubleshoot and close issues quickly.",
+      "Implemented complex Microsoft SQL Server schema changes to support new business requirements without disrupting production.",
     ],
-    tags: ["FastAPI", "React.js", "SQL", "Python"],
+    tags: ["FastAPI", "React.js", "SQL Server", "Python"],
   },
   {
     role: "Full Stack Developer Intern",
-    company: "AceNet Consulting",
+    company: "AceNet Consulting Pvt Ltd",
     dates: "May 2025 — Aug 2025",
     tag: "3 MONTHS",
-    logoUrl: "/acenet-logo.png",
-    logoFallback: "AC",
+    logoUrl: "/loader.png",
     bullets: [
-      "Architected internal proofs of concept (Trade Matching Engine, CMMS, AI applications), taking each from design through working demo.",
-      "Conducted API testing across multiple services using Swagger and Postman, and optimized SQL queries to improve backend performance.",
+      "Architected internal Proofs of Concept (TME, CMMS, AI applications) for business workflow optimization, taking each from design through working demo.",
+      "Conducted API testing using Swagger and Postman across multiple services, and optimized SQL queries to improve backend performance.",
     ],
     tags: ["Python", "FastAPI", "SQL", "SQLite"],
   },
 ];
 
+// Key Projects (Office) — matches resume section 1:1
+// Key Projects (Office)
+const WORK_PROJECTS = [
+  {
+    title: "Micro Frontend Host Architecture",
+    description: "Host application integrating multiple decoupled micro frontends into a single shell, improving load speed and long-term codebase scalability across teams.",
+    tags: ["React.js", "Architecture"],
+  },
+  {
+    title: "Trade Matching Engine (TME)",
+    description: "High-concurrency FastAPI backend paired with a React.js UI, matching multi-party financial trades — automatically calculating settlement amounts and flagging mismatches in real time.",
+    tags: ["FastAPI", "React.js", "SQL"],
+  },
+  {
+    title: "CMMS Management System",
+    description: "Full UI proof of concept for a computerized maintenance management system, covering preventive-maintenance workflows with role-based access control for managers and technicians.",
+    tags: ["React.js", "FastAPI", "SQL"],
+  },
+  {
+    title: "AI VKYC & AI Timesheet Suite",
+    description: "Video KYC verification system built on AWS Rekognition, paired with an AI-driven timesheet processor using AWS Textract and Amazon Bedrock to extract and validate attendance records automatically.",
+    tags: ["OpenAI API", "LLM", "Python"],
+  },
+  {
+    title: "CMMS Agentic AI Telemetry Engine",
+    description: "Autonomous Agentic AI assistant that queries internal APIs to synthesize real-time industrial machine telemetry and maintenance backlogs into actionable summaries.",
+    tags: ["LangChain", "RAG", "LLM", "FastAPI"],
+  },
+];
+
+// Personal Projects
 const PERSONAL_PROJECTS = [
   {
     id: "ai-screener",
     title: "AI Voice Interview Screener",
     description:
-      "An autonomous voice agent that conducts real screening interviews — listens, reasons about answer quality, decides whether to follow up, and speaks back in real time.",
+      "An autonomous voice agent that conducts real screening interviews — listens, reasons about answer quality, decides whether to follow up, and speaks back in real time using speech-to-text and LLM-driven evaluation.",
     tags: ["React.js", "FastAPI", "OpenAI API", "LLM", "RAG"],
     demoUrl: "https://speech-interview-frontend.vercel.app/",
     codeUrl: "#",
@@ -79,65 +115,41 @@ const PERSONAL_PROJECTS = [
   {
     id: "ai-travel",
     title: "AI Travel Agentic Assistant",
-    description:
-      "Conversational agentic AI platform using LangChain and LLM reasoning to plan customized trips based on budgets and constraints.",
+    description: "Conversational agentic AI platform using LangChain and LLM reasoning to plan customized, multi-day trip itineraries based on a user's budget, preferences, and destination constraints.",
     tags: ["Python", "LangChain", "OpenAI API", "LLM"],
     codeUrl: "https://github.com/Nikhil-Dewara/AI_Travel-AgenticAI",
+    demoUrl: "#",
     category: "ai",
   },
   {
     id: "melody",
     title: "Melody E-Commerce Platform",
-    description:
-      "Full-stack e-commerce platform for music/merchandise — complete cart, checkout, order flow, and database models.",
+    description: "Full-stack e-commerce platform for music and merchandise — complete cart, checkout, and order-flow implementation backed by a relational database schema.",
     tags: ["Django", "SQL", "SQLite", "React.js"],
     codeUrl: "https://github.com/Nikhil-Dewara/Melody/tree/main/melodyproject",
+    demoUrl: "#",
     category: "fullstack",
   },
   {
     id: "pizza-app",
     title: "Pizza Ordering Platform",
-    description:
-      "Full-stack food ordering application — Django backend integrated with HTML/CSS, JS, and SQL database end to end.",
+    description: "Full-stack food ordering application with a Django backend integrated end to end with HTML/CSS, JavaScript, and a SQL database for order and inventory management.",
     tags: ["Django", "Python", "SQL", "SQLite"],
-    codeUrl:
-      "https://github.com/Nikhil-Dewara/PizzaProject/tree/main/PizzaProject",
+    codeUrl: "https://github.com/Nikhil-Dewara/PizzaProject/tree/main/PizzaProject",
+    demoUrl: "https://pizza-ordering-platform-6gd3.onrender.com/",
     category: "fullstack",
   },
 ];
 
-const WORK_PROJECTS = [
-  {
-    title: "Trade Matching Engine (TME)",
-    description:
-      "High-concurrency FastAPI backend paired with React.js UI, matching multi-party financial trades, settlement logic, and mismatch validation.",
-    tags: ["FastAPI", "React.js", "SQL"],
-  },
-  {
-    title: "CMMS Management System",
-    description:
-      "Full UI proof of concept for maintenance management covering preventive workflows and role-based access control.",
-    tags: ["React.js", "FastAPI", "SQL"],
-  },
-  {
-    title: "Micro Frontend Host Architecture",
-    description:
-      "Host application integrating multiple decoupled micro frontends, enhancing load speed and modular codebase scalability.",
-    tags: ["React.js", "Architecture"],
-  },
-  {
-    title: "AI VKYC & AI Timesheet Suite",
-    description:
-      "Video KYC verification system alongside AI-driven timesheet processing leveraging cloud AI vision & text extraction.",
-    tags: ["OpenAI API", "LLM", "Python"],
-  },
-  {
-    title: "CMMS Agentic AI Telemetry Engine",
-    description:
-      "Autonomous assistant using agentic orchestration to synthesize real-time industrial machine telemetry data.",
-    tags: ["LangChain", "RAG", "LLM", "FastAPI"],
-  },
-];
+const EDUCATION = {
+  degree: "B.Tech in Computer Science and Engineering",
+  school: "Government Engineering College, Ajmer",
+  dates: "Aug 2019 — Aug 2023",
+  score: "CGPA: 7.5",
+};
+
+const ACHIEVEMENTS = ["Quarterly Performance Award — AceNet Consulting Pvt Ltd."];
+const LANGUAGES = ["English (Native/Bilingual)", "Hindi (Native/Bilingual)"];
 
 function useReveal() {
   const ref = useRef(null);
@@ -145,7 +157,7 @@ function useReveal() {
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([entry]) => entry.isIntersecting && setVisible(true),
-      { threshold: 0.12 },
+      { threshold: 0.12 }
     );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
@@ -156,16 +168,12 @@ function useReveal() {
 function Reveal({ children, className = "" }) {
   const [ref, visible] = useReveal();
   return (
-    <div
-      ref={ref}
-      className={`reveal ${visible ? "reveal--visible" : ""} ${className}`}
-    >
+    <div ref={ref} className={`reveal ${visible ? "reveal--visible" : ""} ${className}`}>
       {children}
     </div>
   );
 }
 
-// PRISM-EDGE TILT CARD
 function TiltCard({ children, className = "", accent = false }) {
   const ref = useRef(null);
 
@@ -217,16 +225,11 @@ function App() {
 
   const scrollerRef = useRef(null);
 
-  // Role Ticker Loop
   useEffect(() => {
-    const interval = setInterval(
-      () => setRoleIndex((i) => (i + 1) % ROLES.length),
-      2400,
-    );
+    const interval = setInterval(() => setRoleIndex((i) => (i + 1) % ROLES.length), 2400);
     return () => clearInterval(interval);
   }, []);
 
-  // Initial Loader Simulation
   useEffect(() => {
     const tick = setInterval(() => {
       setProgress((p) => {
@@ -241,7 +244,6 @@ function App() {
     return () => clearInterval(tick);
   }, []);
 
-  // Active Section Scroll Observer
   useEffect(() => {
     const sections = document.querySelectorAll("section[id]");
     const handleScroll = () => {
@@ -270,7 +272,7 @@ function App() {
       particleCount: 80,
       spread: 70,
       origin: { y: 0.8 },
-      colors: ["#ff5d73", "#6d5ef5", "#00a99c", "#ffa726"],
+      colors: ["#3a5cff", "#7c3aed", "#00c2a8", "#ff9f0a"],
     });
     setTimeout(() => setCopiedEmail(false), 2500);
   }
@@ -284,19 +286,11 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Levitating 3D Prism-Glass WebGL Canvas */}
       <ThreeBackground />
-
-      {/* Custom Liquid Cursor */}
       <CustomCursor />
-
-      {/* iOS Dynamic Island Top Header */}
       <DynamicIsland activeSection={activeSection} />
-
-      {/* iOS Glass Dock Bottom Bar */}
       <GlassDock />
 
-      {/* Initial Prism Glass Loader */}
       {loading && (
         <div className="loader-screen">
           <div className="loader-card glass-card">
@@ -306,12 +300,9 @@ function App() {
             <h2 className="loader-title">
               Ni<span className="accent">k</span>hil Dewara
             </h2>
-            <p className="loader-sub">Full Stack & AI Engineer</p>
+            <p className="loader-sub">$ initializing_portfolio --env=production</p>
             <div className="loader-bar-bg">
-              <div
-                className="loader-bar-fill"
-                style={{ width: `${progress}%` }}
-              />
+              <div className="loader-bar-fill" style={{ width: `${progress}%` }} />
             </div>
             <div className="loader-pct">{Math.floor(progress)}%</div>
           </div>
@@ -342,14 +333,13 @@ function App() {
               </div>
 
               <p className="hero-bio">
-                FastAPI, Django, and React by trade — self-hosted multi-model AI
-                pipelines, LangChain, and RAG applications by curiosity.
-                Building high-concurrency platforms and agentic AI at{" "}
-                <strong>AceNet Consulting</strong>.
+                Software Engineer with 1+ year of experience building backend services in
+                <strong> Python (FastAPI, Django)</strong> and full-stack web apps in <strong>React.js</strong>,
+                across FinTech and maintenance-management domains — REST APIs, micro frontends, JWT auth,
+                AWS, and AI-powered applications at <strong>AceNet Consulting</strong>.
               </p>
 
               <div className="hero-buttons">
-                {/* DIRECT PDF DOWNLOAD LINK */}
                 <a
                   className="btn btn-primary"
                   href="/resume.pdf"
@@ -372,24 +362,22 @@ function App() {
                 </a>
               </div>
 
-              {/* Quick Spec Metrics */}
               <div className="hero-stats-row">
                 <div className="stat-widget">
                   <span className="stat-num">FastAPI & Django</span>
                   <span className="stat-label">High-Performance APIs</span>
                 </div>
                 <div className="stat-widget">
-                  <span className="stat-num">React.js & SQL</span>
+                  <span className="stat-num">React.js & AWS</span>
                   <span className="stat-label">Full Stack Systems</span>
                 </div>
                 <div className="stat-widget">
-                  <span className="stat-num">LangChain & RAG</span>
-                  <span className="stat-label">LLM Agent Pipelines</span>
+                  <span className="stat-num">LangChain & Agno</span>
+                  <span className="stat-label">Agentic AI Pipelines</span>
                 </div>
               </div>
             </div>
 
-            {/* LEVITATING 3D HERO AVATAR CARD */}
             <div className="hero-avatar-wrapper">
               <TiltCard accent className="hero-avatar-card">
                 <div className="avatar-glass-inner">
@@ -415,7 +403,7 @@ function App() {
           </div>
         </section>
 
-        {/* ABOUT & SKILLS SECTION */}
+        {/* ABOUT & SKILLS SECTION — rendered as real code-editor panes */}
         <Reveal>
           <section id="about" className="section">
             <div className="section-header">
@@ -424,42 +412,95 @@ function App() {
             </div>
 
             <div className="about-grid">
-              <TiltCard className="about-main-card">
-                <p className="about-text">
-                  I'm a <strong>Software Engineer</strong> who enjoys owning
-                  problems end-to-end — from architecting a relational database
-                  schema in <strong>SQL & SQLite</strong> to shipping a clean
-                  responsive UI in <strong>React.js</strong>. At AceNet
-                  Consulting, I build high-concurrency trade matching engines
-                  and enterprise workflows.
-                </p>
-                <p className="about-text" style={{ marginTop: "1rem" }}>
-                  I specialize in{" "}
-                  <strong>Agentic AI, LangChain, and RAG architecture</strong> —
-                  combining <strong>FastAPI, Django, and OpenAI APIs</strong> to
-                  build intelligent voice screeners and autonomous decision
-                  systems.
-                </p>
+              <TiltCard className="about-main-card code-window">
+                <div className="code-tabbar">
+                  <div className="code-tab">
+                    <span className="code-tab-dot"></span> profile.md
+                  </div>
+                </div>
+                <div className="code-body">
+                  <div className="code-line">
+                    <span className="code-linenum">1</span>
+                    <span className="code-content code-comment">// whoami</span>
+                  </div>
+                  <div className="code-line">
+                    <span className="code-linenum">2</span>
+                    <span className="code-content code-prose">
+                      Software Engineer with <strong>1+ year of experience</strong> building backend services
+                      in <strong>Python (FastAPI, Django)</strong> and full-stack web applications with
+                      <strong> React.js</strong>, across FinTech and maintenance-management domains.
+                      Experienced with REST APIs, micro frontends, JWT-based authentication, AI-powered
+                      applications, and AWS.
+                    </span>
+                  </div>
+                  <div className="code-line">
+                    <span className="code-linenum">3</span>
+                    <span className="code-content code-comment">// shipped</span>
+                  </div>
+                  <div className="code-line">
+                    <span className="code-linenum">4</span>
+                    <span className="code-content code-prose">
+                      Delivered client-facing projects including a <strong>trade matching engine</strong>,
+                      a <strong>CMMS platform</strong>, and multiple <strong>AI/Agentic AI</strong> proofs of concept
+                      at AceNet Consulting.
+                    </span>
+                  </div>
+                </div>
               </TiltCard>
 
-              {/* SKILLS MATRIX */}
-              <TiltCard accent className="strict-skills-card">
-                <h4 className="skills-title">
-                  <Sparkles /> Tech Stack & Frameworks
-                </h4>
-                <div className="strict-tag-grid">
-                  {STRICT_SKILLS.map((skill) => (
-                    <span key={skill} className="strict-skill-tag">
-                      {skill}
+              <TiltCard accent className="strict-skills-card code-window">
+                <div className="code-tabbar">
+                  <div className="code-tab">
+                    <span className="code-tab-dot"></span> skills.json
+                  </div>
+                </div>
+                <div className="code-body">
+                  <div className="code-line">
+                    <span className="code-linenum">1</span>
+                    <span className="code-content">
+                      <span className="code-punct">{"{"}</span>
                     </span>
+                  </div>
+                  {SKILL_GROUPS.map((group, gi) => (
+                    <div key={group.label}>
+                      <div className="code-line">
+                        <span className="code-linenum">{gi * 2 + 2}</span>
+                        <span className="code-content">
+                          <span className="code-key">{group.label.toLowerCase().replace(/ & | /g, "_")}</span>
+                          <span className="code-punct">: [</span>
+                        </span>
+                      </div>
+                      <div className="code-line">
+                        <span className="code-linenum"></span>
+                        <span className="code-content code-array">
+                          {group.items.map((skill) => (
+                            <span key={skill} className="code-string">
+                              {skill}
+                            </span>
+                          ))}
+                        </span>
+                      </div>
+                      <div className="code-line">
+                        <span className="code-linenum">{gi * 2 + 3}</span>
+                        <span className="code-content">
+                          <span className="code-punct">],</span>
+                        </span>
+                      </div>
+                    </div>
                   ))}
+                  <div className="code-line">
+                    <span className="code-linenum">{SKILL_GROUPS.length * 2 + 2}</span>
+                    <span className="code-content">
+                      <span className="code-punct">{"}"}</span>
+                    </span>
+                  </div>
                 </div>
               </TiltCard>
             </div>
           </section>
         </Reveal>
 
-        {/* EXPERIENCE SECTION WITH COMPANY LOGO PLACEHOLDERS */}
+        {/* EXPERIENCE SECTION */}
         <Reveal>
           <section id="experience" className="section">
             <div className="section-header-row">
@@ -468,16 +509,10 @@ function App() {
                 <h2 className="section-title">Professional Experience</h2>
               </div>
               <div className="scroll-controls">
-                <button
-                  onClick={() => scrollExperience(-1)}
-                  aria-label="Scroll left"
-                >
+                <button onClick={() => scrollExperience(-1)} aria-label="Scroll left">
                   <ChevronLeft />
                 </button>
-                <button
-                  onClick={() => scrollExperience(1)}
-                  aria-label="Scroll right"
-                >
+                <button onClick={() => scrollExperience(1)} aria-label="Scroll right">
                   <ChevronRight />
                 </button>
               </div>
@@ -487,10 +522,9 @@ function App() {
               {EXPERIENCE.map((job, i) => (
                 <TiltCard key={i} accent className="exp-card">
                   <div className="exp-top">
-                    {/* DEDICATED COMPANY LOGO CONTAINER PLACEHOLDER */}
                     <div className="company-logo-container">
                       <img
-                        src="/loader.png"
+                        src={job.logoUrl}
                         alt={`${job.company} logo`}
                         className="company-logo-img"
                         onError={(e) => {
@@ -534,7 +568,6 @@ function App() {
                 <h2 className="section-title">Projects & Applications</h2>
               </div>
 
-              {/* Category Filter Tabs */}
               <div className="project-tabs">
                 <button
                   className={`tab-btn ${projectTab === "all" ? "active" : ""}`}
@@ -558,7 +591,6 @@ function App() {
             </div>
           </Reveal>
 
-          {/* PERSONAL PROJECTS GRID */}
           <div className="standard-project-grid">
             {filteredPersonalProjects.map((p) => (
               <Reveal key={p.title}>
@@ -569,9 +601,7 @@ function App() {
                       <span className="dot dot-amber" />
                       <span className="dot dot-green" />
                     </div>
-                    {p.featured && (
-                      <span className="featured-badge-tag">Featured Build</span>
-                    )}
+                    {p.featured && <span className="featured-badge-tag">Featured Build</span>}
                   </div>
 
                   <h3 className="card-title">{p.title}</h3>
@@ -587,12 +617,7 @@ function App() {
 
                   <div className="card-bottom-actions">
                     {p.codeUrl && p.codeUrl !== "#" ? (
-                      <a
-                        className="btn btn-ghost btn-sm"
-                        href={p.codeUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <a className="btn btn-ghost btn-sm" href={p.codeUrl} target="_blank" rel="noreferrer">
                         <FaGithub size={16} /> Repository
                       </a>
                     ) : (
@@ -600,7 +625,7 @@ function App() {
                     )}
 
                     {p.demoUrl && p.demoUrl !== "#" && (
-                      <a className="btn btn-primary btn-sm" href={p.demoUrl}>
+                      <a className="btn btn-primary btn-sm" href={p.demoUrl} target="_blank" rel="noreferrer">
                         <ExternalLink size={16} /> Live Demo
                       </a>
                     )}
@@ -610,13 +635,10 @@ function App() {
             ))}
           </div>
 
-          {/* ENTERPRISE WORK PROJECTS GRID */}
           <Reveal>
             <div className="section-subtitle-box">
               <span className="badge-pill">Enterprise Projects</span>
-              <h3 className="section-subtitle">
-                AceNet Consulting Deliverables
-              </h3>
+              <h3 className="section-subtitle">AceNet Consulting Deliverables</h3>
             </div>
           </Reveal>
 
@@ -625,18 +647,15 @@ function App() {
               <Reveal key={p.title}>
                 <TiltCard className="standard-project-card work-project-card">
                   <div className="window-chrome">
-                    <div
-                      className="company-logo-container"
-                      style={{ width: "32px", height: "32px" }}
-                    >
-                      <span
-                        className="company-logo-fallback"
-                        style={{ fontSize: "0.75rem" }}
-                      >
-                        AC
-                      </span>
+                    <div className="company-logo-container" style={{ width: "32px", height: "32px" }}>
+                      <img
+                        src="/loader.png"
+                        alt="AceNet logo"
+                        className="company-logo-img"
+                        style={{ width: "32px", height: "32px", objectFit: "contain" }}
+                      />
                     </div>
-                    <span className="tag tag--muted">Client Project</span>
+                    <span className="tag tag--dark">MFE — Company POC</span>
                   </div>
 
                   <h3 className="card-title">{p.title}</h3>
@@ -655,6 +674,53 @@ function App() {
           </div>
         </section>
 
+        {/* EDUCATION & ACHIEVEMENTS SECTION */}
+        <Reveal>
+          <section id="credentials" className="section">
+            <div className="section-header">
+              <span className="badge-pill">Background</span>
+              <h2 className="section-title">Education & Achievements</h2>
+            </div>
+
+            <div className="credentials-grid">
+              <TiltCard className="credential-card">
+                <div className="credential-icon-row">
+                  <div className="credential-icon">
+                    <GraduationCap />
+                  </div>
+                  <h4>Education</h4>
+                </div>
+                <div className="edu-degree">{EDUCATION.degree}</div>
+                <div className="edu-school">{EDUCATION.school}</div>
+                <div className="edu-meta">
+                  {EDUCATION.dates} · {EDUCATION.score}
+                </div>
+              </TiltCard>
+
+              <TiltCard accent className="credential-card">
+                <div className="credential-icon-row">
+                  <div className="credential-icon">
+                    <Award />
+                  </div>
+                  <h4>Achievements & Languages</h4>
+                </div>
+                <ul className="achievement-list">
+                  {ACHIEVEMENTS.map((a) => (
+                    <li key={a}>{a}</li>
+                  ))}
+                </ul>
+                <div className="lang-row">
+                  {LANGUAGES.map((l) => (
+                    <span className="lang-chip" key={l}>
+                      {l}
+                    </span>
+                  ))}
+                </div>
+              </TiltCard>
+            </div>
+          </section>
+        </Reveal>
+
         {/* FOOTER & CONTACT SECTION */}
         <Reveal>
           <footer id="contact" className="footer-section">
@@ -662,19 +728,15 @@ function App() {
               <div className="footer-content">
                 <span className="badge-pill">Get In Touch</span>
                 <h2 className="footer-title">
-                  Let's build{" "}
-                  <span className="accent">something extraordinary</span>
+                  Let's build <span className="accent">something extraordinary</span>
                 </h2>
                 <p className="footer-sub">
-                  Have an open software role, consulting project, or want to
-                  discuss Python, FastAPI & LLM Agent systems? My inbox is open.
+                  Have an open software role, consulting project, or want to discuss Python, FastAPI & LLM Agent
+                  systems? My inbox is open.
                 </p>
 
                 <div className="contact-grid">
-                  <button
-                    className="contact-item-btn"
-                    onClick={handleCopyEmail}
-                  >
+                  <button className="contact-item-btn" onClick={handleCopyEmail}>
                     <div className="contact-icon">
                       <Mail />
                     </div>
@@ -682,9 +744,7 @@ function App() {
                       <span className="contact-label">Email Address</span>
                       <span className="contact-val">nikdewara@gmail.com</span>
                     </div>
-                    <span className="copy-badge">
-                      {copiedEmail ? "Copied! ✨" : "Copy Email"}
-                    </span>
+                    <span className="copy-badge">{copiedEmail ? "Copied! ✨" : "Copy Email"}</span>
                   </button>
 
                   <a className="contact-item-btn" href="tel:+917976603438">
@@ -732,10 +792,7 @@ function App() {
                 </div>
 
                 <div className="footer-bottom">
-                  <p>
-                    © {new Date().getFullYear()} Nikhil Dewara. Prism Glass
-                    Portfolio System.
-                  </p>
+                  <p>© {new Date().getFullYear()} Nikhil Dewara. Built with React & Three.js.</p>
                 </div>
               </div>
             </TiltCard>

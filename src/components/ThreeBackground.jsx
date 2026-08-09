@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-export default function ThreeBackground() {
+export default function AntigravityBackground() {
   const mountRef = useRef(null);
 
   useEffect(() => {
@@ -10,8 +10,9 @@ export default function ThreeBackground() {
 
     const isMobile = window.innerWidth < 768;
 
+    // --- Scene Setup ---
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0xf3f4f7, 0.011);
+    scene.fog = new THREE.FogExp2(0x0a0c16, 0.015); // Dark, deep anti-gravity space vibe
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -19,53 +20,55 @@ export default function ThreeBackground() {
       0.1,
       1000
     );
-    camera.position.z = 42;
+    camera.position.z = 40;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isMobile });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    // Cap pixel ratio harder on mobile — full retina density on a live
-    // particle graph is a real battery/heat cost for little visible gain
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.3 : 2));
     container.appendChild(renderer.domElement);
 
-    // ------------------------------------------------------------------
-    // PARTICLE NETWORK — nodes + dynamically drawn connecting lines.
-    // This is the signature element: a live data-graph rather than
-    // floating decorative shapes, which reads as literally "tech/AI"
-    // instead of jewelry. Node count and link search are both trimmed
-    // on mobile since the O(n^2) proximity check runs every frame.
-    // ------------------------------------------------------------------
-    const NODE_COUNT = isMobile ? 40 : 90;
-    const SPREAD = isMobile ? 30 : 46;
-    const LINK_DIST = isMobile ? 11 : 13;
-
-    const nodeColor = new THREE.Color(0x3a5cff);
-    const nodeColorAlt = new THREE.Color(0x7c3aed);
-    const nodeColorTeal = new THREE.Color(0x00c2a8);
+    // --- Antigravity Nodes Setup ---
+    const NODE_COUNT = isMobile ? 60 : 130;
+    const SPREAD_X = isMobile ? 35 : 50;
+    const SPREAD_Y = 40;
+    const SPREAD_Z = 30;
 
     const nodes = [];
     const nodeGeom = new THREE.BufferGeometry();
     const nodePositions = new Float32Array(NODE_COUNT * 3);
     const nodeColors = new Float32Array(NODE_COUNT * 3);
 
+    const colorPrimary = new THREE.Color(0x00f2fe); // Electric Cyan
+    const colorSecondary = new THREE.Color(0x4facfe); // Soft Blue
+    const colorAccent = new THREE.Color(0x7f00ff); // Neon Purple/Violet
+
     for (let i = 0; i < NODE_COUNT; i++) {
-      const pos = new THREE.Vector3(
-        (Math.random() - 0.5) * SPREAD * 2,
-        (Math.random() - 0.5) * SPREAD * 1.3,
-        (Math.random() - 0.5) * 40 - 10
-      );
-      const drift = new THREE.Vector3(
-        (Math.random() - 0.5) * 0.006,
-        (Math.random() - 0.5) * 0.006,
-        (Math.random() - 0.5) * 0.003
-      );
-      nodes.push({ pos, drift, phase: Math.random() * Math.PI * 2 });
+      const x = (Math.random() - 0.5) * SPREAD_X * 2;
+      const y = (Math.random() - 0.5) * SPREAD_Y * 2;
+      const z = (Math.random() - 0.5) * SPREAD_Z;
 
-      nodePositions[i * 3] = pos.x;
-      nodePositions[i * 3 + 1] = pos.y;
-      nodePositions[i * 3 + 2] = pos.z;
+      // Antigravity properties
+      nodes.push({
+        baseX: x,
+        baseY: y,
+        baseZ: z,
+        x: x,
+        y: y,
+        z: z,
+        vx: 0,
+        vy: Math.random() * 0.02 + 0.01, // Continuous upward float force
+        vz: 0,
+        mass: Math.random() * 0.5 + 0.8,
+        floatOffset: Math.random() * Math.PI * 2,
+      });
 
-      const c = [nodeColor, nodeColorAlt, nodeColorTeal][i % 3];
+      nodePositions[i * 3] = x;
+      nodePositions[i * 3 + 1] = y;
+      nodePositions[i * 3 + 2] = z;
+
+      // Pick dynamic color based on height/index
+      const mixRatio = Math.random();
+      const c = mixRatio > 0.6 ? colorPrimary : mixRatio > 0.3 ? colorSecondary : colorAccent;
       nodeColors[i * 3] = c.r;
       nodeColors[i * 3 + 1] = c.g;
       nodeColors[i * 3 + 2] = c.b;
@@ -74,91 +77,66 @@ export default function ThreeBackground() {
     nodeGeom.setAttribute('position', new THREE.BufferAttribute(nodePositions, 3));
     nodeGeom.setAttribute('color', new THREE.BufferAttribute(nodeColors, 3));
 
-    // Sharp-edged dot sprite (small solid core, thin falloff) — reads as
-    // a precise data point rather than a soft bokeh blob
-    const dotCanvas = document.createElement('canvas');
-    dotCanvas.width = 32;
-    dotCanvas.height = 32;
-    const dctx = dotCanvas.getContext('2d');
-    const dgrad = dctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-    dgrad.addColorStop(0, 'rgba(255,255,255,1)');
-    dgrad.addColorStop(0.55, 'rgba(255,255,255,0.9)');
-    dgrad.addColorStop(1, 'rgba(255,255,255,0)');
-    dctx.fillStyle = dgrad;
-    dctx.fillRect(0, 0, 32, 32);
-    const dotTexture = new THREE.CanvasTexture(dotCanvas);
+    // Particle Glow Texture Creation
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    grad.addColorStop(0.3, 'rgba(0, 242, 254, 0.8)');
+    grad.addColorStop(0.8, 'rgba(127, 0, 255, 0.2)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+    const particleTexture = new THREE.CanvasTexture(canvas);
 
     const nodeMaterial = new THREE.PointsMaterial({
-      size: 2.6,
+      size: 2.2,
       vertexColors: true,
-      map: dotTexture,
+      map: particleTexture,
       transparent: true,
-      opacity: 0.95,
-      blending: THREE.NormalBlending,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
 
-    const nodePoints = new THREE.Points(nodeGeom, nodeMaterial);
-    scene.add(nodePoints);
+    const particleSystem = new THREE.Points(nodeGeom, nodeMaterial);
+    scene.add(particleSystem);
 
-    // Connecting lines, rebuilt each frame based on proximity
-    const MAX_LINES = NODE_COUNT * 6;
-    const linePositions = new Float32Array(MAX_LINES * 2 * 3);
-    const lineColors = new Float32Array(MAX_LINES * 2 * 3);
-    const lineGeom = new THREE.BufferGeometry();
-    lineGeom.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
-    lineGeom.setAttribute('color', new THREE.BufferAttribute(lineColors, 3).setUsage(THREE.DynamicDrawUsage));
-    lineGeom.setDrawRange(0, 0);
+    // --- Floating Antigravity Gyro Rings ---
+    const ringGroup = new THREE.Group();
 
-    const lineMaterial = new THREE.LineBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.22,
-      blending: THREE.NormalBlending,
-    });
-
-    const lineSegments = new THREE.LineSegments(lineGeom, lineMaterial);
-    scene.add(lineSegments);
-
-    const lineColor = new THREE.Color(0x3a5cff);
-
-    // ------------------------------------------------------------------
-    // A single wireframe grid-sphere ("data globe") as the one signature
-    // 3D object — angular, technical, orbit-like rather than organic
-    // ------------------------------------------------------------------
-    const globeMaterial = new THREE.MeshBasicMaterial({
-      color: 0x3a5cff,
+    const outerRingGeo = new THREE.TorusGeometry(12, 0.15, 16, 100);
+    const innerRingGeo = new THREE.TorusGeometry(8, 0.1, 16, 80);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x00f2fe,
       wireframe: true,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending,
     });
-    const globeGeo = new THREE.IcosahedronGeometry(9, isMobile ? 1 : 2);
-    const globe = new THREE.Mesh(globeGeo, globeMaterial);
-    globe.position.set(26, 6, -20);
-    scene.add(globe);
 
-    const ringMaterial = new THREE.MeshBasicMaterial({
-      color: 0x00c2a8,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.3,
-    });
-    const ringGeo = new THREE.TorusGeometry(7, 0.4, 8, 40);
-    const ring = new THREE.Mesh(ringGeo, ringMaterial);
-    ring.position.set(-30, -10, -18);
-    ring.rotation.x = Math.PI / 3;
-    scene.add(ring);
+    const outerRing = new THREE.Mesh(outerRingGeo, ringMat);
+    const innerRing = new THREE.Mesh(innerRingGeo, ringMat);
 
-    // Mouse tracking
-    let targetMouseX = 0;
-    let targetMouseY = 0;
-    let currentMouseX = 0;
-    let currentMouseY = 0;
+    ringGroup.add(outerRing);
+    ringGroup.add(innerRing);
+    ringGroup.position.set(15, 0, -10);
+    scene.add(ringGroup);
+
+    // --- Mouse & Raycasting Forces ---
+    const mouse = new THREE.Vector2(-999, -999);
+    const targetMouse = new THREE.Vector2(-999, -999);
+    const raycaster = new THREE.Raycaster();
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    const mouseWorldPos = new THREE.Vector3();
 
     const handleMouseMove = (e) => {
-      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
+
     window.addEventListener('mousemove', handleMouseMove);
 
     const handleResize = () => {
@@ -166,8 +144,10 @@ export default function ThreeBackground() {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
+
     window.addEventListener('resize', handleResize);
 
+    // --- Animation Loop ---
     let clock = new THREE.Clock();
     let animId;
 
@@ -175,76 +155,75 @@ export default function ThreeBackground() {
       animId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      currentMouseX += (targetMouseX - currentMouseX) * 0.04;
-      currentMouseY += (targetMouseY - currentMouseY) * 0.04;
+      // Smooth Mouse Interpolation
+      mouse.x += (targetMouse.x - mouse.x) * 0.05;
+      mouse.y += (targetMouse.y - mouse.y) * 0.05;
 
-      camera.position.x = currentMouseX * 6;
-      camera.position.y = -currentMouseY * 4;
+      // Project mouse into 3D Space
+      raycaster.setFromCamera(mouse, camera);
+      raycaster.ray.intersectPlane(plane, mouseWorldPos);
+
+      // Camera parallax
+      camera.position.x += (mouse.x * 3 - camera.position.x) * 0.03;
+      camera.position.y += (mouse.y * 3 - camera.position.y) * 0.03;
       camera.lookAt(scene.position);
 
-      // Drift nodes gently, keep them within bounds
+      // Physics Update for Antigravity Nodes
       const posAttr = nodeGeom.attributes.position;
+
       for (let i = 0; i < NODE_COUNT; i++) {
         const n = nodes[i];
-        n.pos.x += n.drift.x + Math.sin(elapsedTime * 0.3 + n.phase) * 0.01;
-        n.pos.y += n.drift.y + Math.cos(elapsedTime * 0.25 + n.phase) * 0.01;
-        n.pos.z += n.drift.z;
 
-        if (Math.abs(n.pos.x) > SPREAD) n.drift.x *= -1;
-        if (Math.abs(n.pos.y) > SPREAD * 0.7) n.drift.y *= -1;
-        if (Math.abs(n.pos.z) > 30) n.drift.z *= -1;
+        // 1. Antigravity Upward Drift
+        n.y += n.vy;
 
-        posAttr.setXYZ(i, n.pos.x, n.pos.y, n.pos.z);
-      }
-      posAttr.needsUpdate = true;
-      nodePoints.rotation.y = currentMouseX * 0.08;
-
-      // Rebuild connecting lines based on current proximity
-      let lineIdx = 0;
-      const linePosAttr = lineGeom.attributes.position;
-      const lineColAttr = lineGeom.attributes.color;
-      for (let i = 0; i < NODE_COUNT && lineIdx < MAX_LINES; i++) {
-        for (let j = i + 1; j < NODE_COUNT && lineIdx < MAX_LINES; j++) {
-          const dx = nodes[i].pos.x - nodes[j].pos.x;
-          const dy = nodes[i].pos.y - nodes[j].pos.y;
-          const dz = nodes[i].pos.z - nodes[j].pos.z;
-          const distSq = dx * dx + dy * dy + dz * dz;
-          if (distSq < LINK_DIST * LINK_DIST) {
-            const base = lineIdx * 6;
-            linePosAttr.array[base] = nodes[i].pos.x;
-            linePosAttr.array[base + 1] = nodes[i].pos.y;
-            linePosAttr.array[base + 2] = nodes[i].pos.z;
-            linePosAttr.array[base + 3] = nodes[j].pos.x;
-            linePosAttr.array[base + 4] = nodes[j].pos.y;
-            linePosAttr.array[base + 5] = nodes[j].pos.z;
-
-            lineColAttr.array[base] = lineColor.r;
-            lineColAttr.array[base + 1] = lineColor.g;
-            lineColAttr.array[base + 2] = lineColor.b;
-            lineColAttr.array[base + 3] = lineColor.r;
-            lineColAttr.array[base + 4] = lineColor.g;
-            lineColAttr.array[base + 5] = lineColor.b;
-
-            lineIdx++;
-          }
+        // Reset if float out of upper boundary
+        if (n.y > SPREAD_Y) {
+          n.y = -SPREAD_Y;
+          n.x = (Math.random() - 0.5) * SPREAD_X * 2;
         }
-      }
-      lineGeom.setDrawRange(0, lineIdx * 2);
-      linePosAttr.needsUpdate = true;
-      lineColAttr.needsUpdate = true;
 
-      // Slow rotation on the two signature wireframe forms
-      globe.rotation.y += 0.0015;
-      globe.rotation.x += 0.0006;
-      ring.rotation.z += 0.002;
-      ring.position.y = -10 + Math.sin(elapsedTime * 0.6) * 2;
-      globe.position.y = 6 + Math.sin(elapsedTime * 0.5 + 2) * 2;
+        // 2. Harmonic Horizontal Wiggle (Zero-G drift)
+        const waveX = Math.sin(elapsedTime * 0.8 + n.floatOffset) * 0.03;
+        const waveZ = Math.cos(elapsedTime * 0.6 + n.floatOffset) * 0.02;
+
+        // 3. Mouse Repulsion Force Field
+        const dx = n.x - mouseWorldPos.x;
+        const dy = n.y - mouseWorldPos.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const forceRadius = 15;
+
+        if (dist < forceRadius) {
+          const force = (1 - dist / forceRadius) * 0.8;
+          n.vx += (dx / dist) * force;
+          n.vy += (dy / dist) * force;
+        }
+
+        // Apply velocities with damping/friction
+        n.vx *= 0.92;
+        n.x += n.vx + waveX;
+        n.z += waveZ;
+
+        posAttr.setXYZ(i, n.x, n.y, n.z);
+      }
+
+      posAttr.needsUpdate = true;
+
+      // Antigravity Gyro Rings Rotation
+      outerRing.rotation.x = elapsedTime * 0.2;
+      outerRing.rotation.y = elapsedTime * 0.3;
+      innerRing.rotation.x = -elapsedTime * 0.4;
+      innerRing.rotation.z = elapsedTime * 0.2;
+
+      // Vertical Floating Bob
+      ringGroup.position.y = Math.sin(elapsedTime * 0.7) * 3;
 
       renderer.render(scene, camera);
     };
 
     animate();
 
+    // Cleanup
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
@@ -253,16 +232,14 @@ export default function ThreeBackground() {
         container.removeChild(renderer.domElement);
       }
       nodeGeom.dispose();
-      lineGeom.dispose();
-      globeGeo.dispose();
-      ringGeo.dispose();
+      outerRingGeo.dispose();
+      innerRingGeo.dispose();
       nodeMaterial.dispose();
-      lineMaterial.dispose();
-      globeMaterial.dispose();
-      ringMaterial.dispose();
+      ringMat.dispose();
+      particleTexture.dispose();
       renderer.dispose();
     };
   }, []);
 
-  return <div ref={mountRef} className="three-bg-canvas" />;
+  return <div ref={mountRef} className="three-bg-canvas" style={{ position: 'fixed', inset: 0, pointerEvents: 'none' }} />;
 }

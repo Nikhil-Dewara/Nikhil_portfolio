@@ -7,8 +7,8 @@
 :root {
   --bg-void: #f3f4f7;
   --bg-void-deep: #e9ebf1;
-  --bg-card: rgba(255, 255, 255, 0.86);
-  --bg-card-accent: rgba(255, 255, 255, 0.95);
+  --bg-card: rgba(255, 255, 255, 0.96);
+  --bg-card-accent: rgba(255, 255, 255, 1);
 
   --glass-border: rgba(11, 14, 20, 0.12);
   --glass-border-strong: rgba(11, 14, 20, 0.22);
@@ -24,9 +24,9 @@
   --gradient-sun: linear-gradient(120deg, var(--accent-amber), var(--accent-blue));
   --gradient-cool: linear-gradient(120deg, var(--accent-violet), var(--accent-teal));
 
-  --text-main: #090b10;
-  --text-muted: #5a5f70;
-  --text-sub: #2c2e3a;
+  --text-main: #08090d;
+  --text-muted: #3a3d49;
+  --text-sub: #1c1e26;
 
   --shadow-color: 11, 14, 20;
 
@@ -424,11 +424,15 @@ body::after {
   left: 0;
   right: 0;
   height: 3px;
-  background: var(--gradient-prism);
+  background: var(--accent-blue);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: transform 0.3s cubic-bezier(0.65, 0, 0.35, 1);
   z-index: 3;
+}
+
+.tilt-card--accent::before {
+  background: var(--accent-violet);
 }
 
 .tilt-card:hover {
@@ -499,21 +503,16 @@ body::after {
   align-items: center;
   gap: 6px;
   font-family: var(--font-code);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent-blue);
-  background: rgba(58, 92, 255, 0.08);
-  border: 1px solid rgba(58, 92, 255, 0.28);
-  padding: 4px 12px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-style: italic;
+  color: #0f7a38;
+  margin-bottom: 10px;
 }
 
 .badge-pill::before {
   content: '//';
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .section-title {
@@ -609,10 +608,25 @@ body::after {
 
 .role-text {
   color: var(--accent-blue);
-  font-family: var(--font-heading);
-  border-bottom: 2px solid var(--accent-violet);
+  font-family: var(--font-code);
   padding-bottom: 2px;
   animation: fadeIn 0.4s ease;
+}
+
+.role-text::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background: var(--accent-blue);
+  margin-left: 4px;
+  vertical-align: text-bottom;
+  animation: blinkCursor 1s step-end infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 @keyframes fadeIn {
@@ -887,6 +901,63 @@ body::after {
   box-shadow: 0 6px 14px rgba(58, 92, 255, 0.18);
 }
 
+/* Category-colored variants — mirrors how the resume groups skills
+   (Programming / Cloud / AI) rather than one flat undifferentiated list */
+.skill-group {
+  margin-bottom: 20px;
+}
+
+.skill-group:last-child {
+  margin-bottom: 0;
+}
+
+.skill-group-label {
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.skill-group-label--blue { color: var(--accent-blue); }
+.skill-group-label--teal { color: #0f766e; }
+.skill-group-label--violet { color: var(--accent-violet); }
+
+.strict-skill-tag--blue {
+  background: rgba(58, 92, 255, 0.06);
+  border-color: rgba(58, 92, 255, 0.3);
+}
+.strict-skill-tag--blue::before { background: var(--accent-blue); }
+.strict-skill-tag--blue:hover {
+  background: rgba(58, 92, 255, 0.12);
+  border-color: var(--accent-blue);
+  box-shadow: 0 6px 14px rgba(58, 92, 255, 0.18);
+}
+
+.strict-skill-tag--teal {
+  background: rgba(15, 118, 110, 0.06);
+  border-color: rgba(15, 118, 110, 0.3);
+}
+.strict-skill-tag--teal::before { background: #0f766e; }
+.strict-skill-tag--teal:hover {
+  background: rgba(15, 118, 110, 0.12);
+  border-color: #0f766e;
+  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.18);
+}
+
+.strict-skill-tag--violet {
+  background: rgba(124, 58, 237, 0.06);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+.strict-skill-tag--violet::before { background: var(--accent-violet); }
+.strict-skill-tag--violet:hover {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: var(--accent-violet);
+  box-shadow: 0 6px 14px rgba(124, 58, 237, 0.18);
+}
+
 /* ==========================================================================
    EXPERIENCE SECTION
    ========================================================================== */
@@ -1020,28 +1091,41 @@ body::after {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
   margin-bottom: 24px;
+  counter-reset: line;
 }
 
 .exp-bullet-list li {
   position: relative;
-  padding-left: 18px;
+  counter-increment: line;
+  padding-left: 34px;
   font-size: 0.89rem;
   color: var(--text-sub);
 }
 
 .exp-bullet-list li::before {
-  content: "▹";
+  content: counter(line, decimal-leading-zero);
   position: absolute;
   left: 0;
+  top: 0.1em;
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--accent-blue);
+  opacity: 0.55;
 }
 
 .tag-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.standard-project-card .tag-row {
+  flex-shrink: 0;
+  max-height: 2.6em;
+  overflow: hidden;
 }
 
 .tag {
@@ -1104,7 +1188,8 @@ body::after {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 280px;
+  height: 320px;
+  overflow: hidden;
 }
 
 .window-chrome {
@@ -1112,6 +1197,7 @@ body::after {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .window-dots {
@@ -1147,6 +1233,13 @@ body::after {
   color: var(--text-main);
   margin-bottom: 10px;
   line-height: 1.25;
+  flex-shrink: 0;
+  /* Cap to 2 lines so title length never changes card height */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.25em * 2);
 }
 
 .card-desc {
@@ -1154,6 +1247,13 @@ body::after {
   color: var(--text-sub);
   margin-bottom: 20px;
   line-height: 1.6;
+  flex: 1;
+  /* Cap to 4 lines so description length never changes card height —
+     every card reserves exactly the same block regardless of copy length */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-bottom-actions {
@@ -1163,6 +1263,7 @@ body::after {
   justify-content: space-between;
   padding-top: 16px;
   border-top: 1px solid var(--glass-border);
+  flex-shrink: 0;
 }
 
 .section-subtitle-box {
@@ -1171,10 +1272,113 @@ body::after {
 }
 
 .work-project-card {
-  padding: 24px;
   border-style: solid;
   border-color: var(--glass-border);
-  min-height: 240px;
+}
+
+/* ==========================================================================
+   EDUCATION & ACHIEVEMENTS
+   ========================================================================== */
+
+.credentials-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.credential-card {
+  padding: 30px;
+}
+
+.credential-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.credential-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: rgba(58, 92, 255, 0.08);
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.credential-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.credential-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.edu-degree {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.edu-school {
+  font-size: 0.94rem;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+
+.edu-meta {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.achievement-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.achievement-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.92rem;
+  color: var(--text-sub);
+}
+
+.achievement-list li::before {
+  content: "▹";
+  position: absolute;
+  left: 0;
+  color: var(--accent-violet);
+}
+
+.lang-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.lang-chip {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--text-sub);
+  background: rgba(11, 14, 20, 0.04);
+  border: 1px solid var(--glass-border);
+  padding: 4px 11px;
+  border-radius: 6px;
 }
 
 /* ==========================================================================
@@ -1383,6 +1587,135 @@ body::after {
 }
 
 /* ==========================================================================
+   CODE EDITOR PANES
+   The single strongest "built by a developer" signal available: real file
+   tabs, a line-number gutter, and syntax-style token colour. Used for the
+   About and Skills cards instead of generic panels.
+   ========================================================================== */
+
+.code-window {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-tabbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px 0;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(11, 14, 20, 0.025);
+}
+
+.code-tab {
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #ffffff;
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  padding: 7px 14px;
+  border-radius: 6px 6px 0 0;
+}
+
+.code-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+}
+
+.code-body {
+  padding: 20px 22px 24px;
+  flex: 1;
+}
+
+.code-line {
+  display: flex;
+  gap: 18px;
+}
+
+.code-linenum {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  opacity: 0.45;
+  user-select: none;
+  min-width: 16px;
+  text-align: right;
+  flex-shrink: 0;
+  padding-top: 0.1em;
+}
+
+.code-content {
+  flex: 1;
+}
+
+.code-comment {
+  font-family: var(--font-code);
+  font-size: 0.86rem;
+  color: var(--accent-teal);
+  opacity: 0.85;
+}
+
+.code-prose {
+  font-family: var(--font-body);
+  font-size: 1.03rem;
+  color: var(--text-sub);
+  line-height: 1.75;
+  padding-bottom: 4px;
+}
+
+.code-prose strong {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+/* Skills-as-code: rendered as a literal JS object so the stack reads as
+   data, not decoration */
+.code-key {
+  font-family: var(--font-code);
+  font-size: 0.88rem;
+  color: var(--accent-violet);
+  font-weight: 600;
+}
+
+.code-punct {
+  font-family: var(--font-code);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.code-array {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 4px 0 10px 20px;
+}
+
+.code-string {
+  font-family: var(--font-code);
+  font-size: 0.82rem;
+  color: #0a7d3d;
+  background: rgba(10, 125, 61, 0.07);
+  border: 1px solid rgba(10, 125, 61, 0.18);
+  padding: 3px 9px;
+  border-radius: 5px;
+  transition: all 0.18s ease;
+}
+
+.code-string:hover {
+  background: rgba(10, 125, 61, 0.14);
+  border-color: rgba(10, 125, 61, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
    RESPONSIVE BREAKPOINTS
    ========================================================================== */
 
@@ -1412,6 +1745,9 @@ body::after {
     font-size: 3.4rem;
   }
   .about-grid {
+    grid-template-columns: 1fr;
+  }
+  .credentials-grid {
     grid-template-columns: 1fr;
   }
   .contact-grid {
