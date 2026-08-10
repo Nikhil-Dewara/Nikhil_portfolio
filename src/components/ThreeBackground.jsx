@@ -126,29 +126,25 @@ export default function AntigravityBackground() {
     scene.add(ringGroup);
 
     // --- Mouse & Raycasting Forces ---
-    // FIX: these used to start at (-999, -999) as a "no interaction yet"
-    // sentinel. The problem: `mouse` also drives the camera parallax
-    // (camera.position.x/y lerp toward mouse.x*3 / mouse.y*3 every frame),
-    // so before the first mousemove the camera was lerping 3%/frame toward
-    // x = -999*3 = -2997 — flinging the whole scene off to the side. Once
-    // you moved the mouse, `mouse` itself then had to lerp 5%/frame all the
-    // way back from -999 to a real value near 0, which takes ~130+ frames
-    // (~2-4s depending on framerate) — that's the exact delay you saw.
-    // Fix: default both to (0, 0) so the camera starts centered instantly,
-    // and use a separate `hasInteracted` flag to gate the repulsion force
-    // so it still waits for a real mouse position instead of using (0,0)
-    // as if the cursor were at screen-center.
-    const mouse = new THREE.Vector2(0, 0);
-    const targetMouse = new THREE.Vector2(0, 0);
-    let hasInteracted = false;
+    const mouse = new THREE.Vector2(-999, -999);
+    const targetMouse = new THREE.Vector2(-999, -999);
     const raycaster = new THREE.Raycaster();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    const mouseWorldPos = new THREE.Vector3(9999, 9999, 0); // parked far away until real input
+    const mouseWorldPos = new THREE.Vector3();
+
+    // FIX: previously targetMouse only left (-999,-999) once the user's
+    // FIRST real mousemove fired — so the "reveal" only started whenever
+    // that happened to occur, and the slow 0.05/0.03 lerp rates below took
+    // ~2-3s on top of that just to converge. That's why total time felt
+    // inconsistent and closer to 3-4s. Kicking targetMouse to (0,0) here,
+    // immediately on mount, makes the reveal start the instant the scene
+    // loads rather than waiting on the user — same visual effect (camera
+    // swings in from off-screen), now deterministic.
+    targetMouse.set(0, 0);
 
     const handleMouseMove = (e) => {
       targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      hasInteracted = true;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -170,21 +166,22 @@ export default function AntigravityBackground() {
       const elapsedTime = clock.getElapsedTime();
 
       // Smooth Mouse Interpolation
-      mouse.x += (targetMouse.x - mouse.x) * 0.05;
-      mouse.y += (targetMouse.y - mouse.y) * 0.05;
+      // FIX: 0.05 -> 0.16. At 0.05/frame, converging from -999 toward 0
+      // takes ~130+ frames (~2.2s+ at 60fps) before it's even close. At
+      // 0.16/frame it converges to a negligible offset within ~35 frames
+      // (well under 1s), then real mouse movement takes over normally.
+      mouse.x += (targetMouse.x - mouse.x) * 0.16;
+      mouse.y += (targetMouse.y - mouse.y) * 0.16;
 
-      // Project mouse into 3D Space — only once the user has actually
-      // moved the mouse, otherwise leave mouseWorldPos parked far away
-      // so the repulsion force never applies to a phantom (0,0) cursor
-      if (hasInteracted) {
-        raycaster.setFromCamera(mouse, camera);
-        raycaster.ray.intersectPlane(plane, mouseWorldPos);
-      }
+      // Project mouse into 3D Space
+      raycaster.setFromCamera(mouse, camera);
+      raycaster.ray.intersectPlane(plane, mouseWorldPos);
 
-      // Camera parallax — now starts at (0,0) so this is a gentle, instant
-      // settle around center rather than a multi-second recovery
-      camera.position.x += (mouse.x * 3 - camera.position.x) * 0.03;
-      camera.position.y += (mouse.y * 3 - camera.position.y) * 0.03;
+      // Camera parallax
+      // FIX: 0.03 -> 0.14, so the camera itself doesn't add its own extra
+      // multi-second lag on top of the mouse convergence above.
+      camera.position.x += (mouse.x * 3 - camera.position.x) * 0.14;
+      camera.position.y += (mouse.y * 3 - camera.position.y) * 0.14;
       camera.lookAt(scene.position);
 
       // Physics Update for Antigravity Nodes
