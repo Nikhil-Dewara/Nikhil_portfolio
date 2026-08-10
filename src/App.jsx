@@ -348,10 +348,10 @@ function App() {
               <div className="hero-buttons">
                 <a
                   className="btn btn-primary"
-                  href="/Nikhil_Dewara_Resume.pdf"
+                  href="/Nikhil_Dewara_Resume_.pdf"
                   target="_blank"
                   rel="noreferrer"
-                  download="Nikhil_Dewara_Resume.pdf"
+                  download="Nikhil_Dewara_Resume_.pdf"
                 >
                   <Download /> Download Resume
                 </a>
