@@ -156,16 +156,21 @@ export default function AntigravityBackground() {
       const elapsedTime = clock.getElapsedTime();
 
       // Smooth Mouse Interpolation
-      mouse.x += (targetMouse.x - mouse.x) * 0.05;
-      mouse.y += (targetMouse.y - mouse.y) * 0.05;
+      // CHANGED: 0.05 -> 0.16 so that once you move the mouse, `mouse`
+      // catches up to the real target in ~35 frames (well under 1s)
+      // instead of ~130+ frames (~2-3s at 60fps).
+      mouse.x += (targetMouse.x - mouse.x) * 0.16;
+      mouse.y += (targetMouse.y - mouse.y) * 0.16;
 
       // Project mouse into 3D Space
       raycaster.setFromCamera(mouse, camera);
       raycaster.ray.intersectPlane(plane, mouseWorldPos);
 
       // Camera parallax
-      camera.position.x += (mouse.x * 3 - camera.position.x) * 0.03;
-      camera.position.y += (mouse.y * 3 - camera.position.y) * 0.03;
+      // CHANGED: 0.03 -> 0.14 so the camera doesn't add its own extra lag
+      // on top of the mouse catching up above.
+      camera.position.x += (mouse.x * 3 - camera.position.x) * 0.14;
+      camera.position.y += (mouse.y * 3 - camera.position.y) * 0.14;
       camera.lookAt(scene.position);
 
       // Physics Update for Antigravity Nodes
