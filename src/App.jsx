@@ -231,18 +231,24 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const tick = setInterval(() => {
-      setProgress((p) => {
-        const next = Math.min(p + Math.random() * 25, 100);
-        if (next >= 100) {
-          clearInterval(tick);
-          setTimeout(() => setLoading(false), 350);
-        }
-        return next;
-      });
-    }, 100);
-    return () => clearInterval(tick);
-  }, []);
+  const duration = 2000; // 3 seconds
+
+  const startTime = Date.now();
+
+  const timer = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const percentage = Math.min((elapsed / duration) * 100, 100);
+
+    setProgress(percentage);
+
+    if (percentage >= 100) {
+      clearInterval(timer);
+      setTimeout(() => setLoading(false), 200);
+    }
+  }, 50);
+
+  return () => clearInterval(timer);
+}, []);
 
   useEffect(() => {
     const sections = document.querySelectorAll("section[id]");
@@ -295,7 +301,7 @@ function App() {
         <div className="loader-screen">
           <div className="loader-card glass-card">
             <div className="apple-logo-badge">
-              <span>ND</span>
+              <img src="/NikhilLogo.png" alt="Nikhil Logo" />
             </div>
             <h2 className="loader-title">
               Ni<span className="accent">k</span>hil Dewara
@@ -342,7 +348,7 @@ function App() {
               <div className="hero-buttons">
                 <a
                   className="btn btn-primary"
-                  href="/resume.pdf"
+                  href="/Nikhil_Dewara_Resume.pdf"
                   target="_blank"
                   rel="noreferrer"
                   download="Nikhil_Dewara_Resume.pdf"
