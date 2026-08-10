@@ -24,20 +24,6 @@ export default function DynamicIsland({ activeSection }) {
             <span className="brand-name">Ni<span className="accent">k</span>hil Dewara</span>
             <span className="brand-status">AceNet Consulting · Software Engineer</span>
           </div>
-
-          {/* Sound / Music Widget Mini */}
-          <div className="island-audio-widget" onClick={togglePlay} title="Ambient Music Toggle">
-            {isPlaying ? (
-              <div className="audio-bars playing">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            ) : (
-              <Music2 size={16} />
-            )}
-          </div>
         </div>
 
         {/* Expanded Navigation Bar */}
