@@ -1533,19 +1533,23 @@ body::after {
 }
 
 .apple-logo-badge {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  background: var(--gradient-prism);
-  color: #fff;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.4rem;
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  box-shadow: 0 10px 22px rgba(58, 92, 255, 0.35);
+  box-shadow: 0 10px 22px rgba(96, 96, 99, 0.35);
+  overflow: hidden; /* Keeps image bounds contained within border-radius */
+}
+
+/* Image styling */
+.apple-logo-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Use 'cover' if you want the image to completely fill the space */
+  padding: 6px;        /* Optional padding if the logo touches the edges */
 }
 
 .loader-title {
