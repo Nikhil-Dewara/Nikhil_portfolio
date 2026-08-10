@@ -231,7 +231,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-  const duration = 2000; // 3 seconds
+  const duration = 1500; // 3 seconds
 
   const startTime = Date.now();
 
