@@ -126,15 +126,29 @@ export default function AntigravityBackground() {
     scene.add(ringGroup);
 
     // --- Mouse & Raycasting Forces ---
-    const mouse = new THREE.Vector2(-999, -999);
-    const targetMouse = new THREE.Vector2(-999, -999);
+    // FIX: these used to start at (-999, -999) as a "no interaction yet"
+    // sentinel. The problem: `mouse` also drives the camera parallax
+    // (camera.position.x/y lerp toward mouse.x*3 / mouse.y*3 every frame),
+    // so before the first mousemove the camera was lerping 3%/frame toward
+    // x = -999*3 = -2997 — flinging the whole scene off to the side. Once
+    // you moved the mouse, `mouse` itself then had to lerp 5%/frame all the
+    // way back from -999 to a real value near 0, which takes ~130+ frames
+    // (~2-4s depending on framerate) — that's the exact delay you saw.
+    // Fix: default both to (0, 0) so the camera starts centered instantly,
+    // and use a separate `hasInteracted` flag to gate the repulsion force
+    // so it still waits for a real mouse position instead of using (0,0)
+    // as if the cursor were at screen-center.
+    const mouse = new THREE.Vector2(0, 0);
+    const targetMouse = new THREE.Vector2(0, 0);
+    let hasInteracted = false;
     const raycaster = new THREE.Raycaster();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-    const mouseWorldPos = new THREE.Vector3();
+    const mouseWorldPos = new THREE.Vector3(9999, 9999, 0); // parked far away until real input
 
     const handleMouseMove = (e) => {
       targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      hasInteracted = true;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -159,11 +173,16 @@ export default function AntigravityBackground() {
       mouse.x += (targetMouse.x - mouse.x) * 0.05;
       mouse.y += (targetMouse.y - mouse.y) * 0.05;
 
-      // Project mouse into 3D Space
-      raycaster.setFromCamera(mouse, camera);
-      raycaster.ray.intersectPlane(plane, mouseWorldPos);
+      // Project mouse into 3D Space — only once the user has actually
+      // moved the mouse, otherwise leave mouseWorldPos parked far away
+      // so the repulsion force never applies to a phantom (0,0) cursor
+      if (hasInteracted) {
+        raycaster.setFromCamera(mouse, camera);
+        raycaster.ray.intersectPlane(plane, mouseWorldPos);
+      }
 
-      // Camera parallax
+      // Camera parallax — now starts at (0,0) so this is a gentle, instant
+      // settle around center rather than a multi-second recovery
       camera.position.x += (mouse.x * 3 - camera.position.x) * 0.03;
       camera.position.y += (mouse.y * 3 - camera.position.y) * 0.03;
       camera.lookAt(scene.position);
