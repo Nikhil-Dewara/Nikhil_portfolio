@@ -12,7 +12,7 @@ export default function AntigravityBackground() {
 
     // --- Scene Setup ---
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0a0c16, 0.015); // Dark, deep anti-gravity space vibe
+    scene.fog = new THREE.FogExp2(0x0a0c16, 0.015);
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -38,16 +38,15 @@ export default function AntigravityBackground() {
     const nodePositions = new Float32Array(NODE_COUNT * 3);
     const nodeColors = new Float32Array(NODE_COUNT * 3);
 
-    const colorPrimary = new THREE.Color(0x00f2fe); // Electric Cyan
-    const colorSecondary = new THREE.Color(0x4facfe); // Soft Blue
-    const colorAccent = new THREE.Color(0x7f00ff); // Neon Purple/Violet
+    const colorPrimary = new THREE.Color(0x00f2fe);
+    const colorSecondary = new THREE.Color(0x4facfe);
+    const colorAccent = new THREE.Color(0x7f00ff);
 
     for (let i = 0; i < NODE_COUNT; i++) {
       const x = (Math.random() - 0.5) * SPREAD_X * 2;
       const y = (Math.random() - 0.5) * SPREAD_Y * 2;
       const z = (Math.random() - 0.5) * SPREAD_Z;
 
-      // Antigravity properties
       nodes.push({
         baseX: x,
         baseY: y,
@@ -56,7 +55,7 @@ export default function AntigravityBackground() {
         y: y,
         z: z,
         vx: 0,
-        vy: Math.random() * 0.02 + 0.01, // Continuous upward float force
+        vy: Math.random() * 0.02 + 0.01,
         vz: 0,
         mass: Math.random() * 0.5 + 0.8,
         floatOffset: Math.random() * Math.PI * 2,
@@ -66,7 +65,6 @@ export default function AntigravityBackground() {
       nodePositions[i * 3 + 1] = y;
       nodePositions[i * 3 + 2] = z;
 
-      // Pick dynamic color based on height/index
       const mixRatio = Math.random();
       const c = mixRatio > 0.6 ? colorPrimary : mixRatio > 0.3 ? colorSecondary : colorAccent;
       nodeColors[i * 3] = c.r;
@@ -77,7 +75,7 @@ export default function AntigravityBackground() {
     nodeGeom.setAttribute('position', new THREE.BufferAttribute(nodePositions, 3));
     nodeGeom.setAttribute('color', new THREE.BufferAttribute(nodeColors, 3));
 
-    // Particle Glow Texture Creation
+    // Particle Glow Texture
     const canvas = document.createElement('canvas');
     canvas.width = 64;
     canvas.height = 64;
@@ -125,19 +123,36 @@ export default function AntigravityBackground() {
     ringGroup.position.set(15, 0, -10);
     scene.add(ringGroup);
 
-    // --- Mouse & Raycasting Forces ---
+    // --- Mouse / Touch & Raycasting Forces ---
     const mouse = new THREE.Vector2(-999, -999);
     const targetMouse = new THREE.Vector2(-999, -999);
     const raycaster = new THREE.Raycaster();
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     const mouseWorldPos = new THREE.Vector3();
 
+    // NEW — tracks whether the user has actually interacted yet.
+    // On mobile, until this flips true, we auto-drive the pointer so the
+    // effect plays on its own instead of requiring a tap first.
+    let hasInteracted = false;
+
     const handleMouseMove = (e) => {
       targetMouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       targetMouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      hasInteracted = true;
+    };
+
+    // NEW — mobile never fires mousemove, only touch events
+    const handleTouchMove = (e) => {
+      if (!e.touches || !e.touches.length) return;
+      const touch = e.touches[0];
+      targetMouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+      targetMouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+      hasInteracted = true;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchstart', handleTouchMove, { passive: true });
 
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -155,44 +170,39 @@ export default function AntigravityBackground() {
       animId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Smooth Mouse Interpolation
-      // CHANGED: 0.05 -> 0.16 so that once you move the mouse, `mouse`
-      // catches up to the real target in ~35 frames (well under 1s)
-      // instead of ~130+ frames (~2-3s at 60fps).
+      // NEW — on mobile, before any touch happens, wander the virtual
+      // pointer in a slow organic loop so the animation is visibly alive
+      // from the first frame, matching the desktop hover experience.
+      if (isMobile && !hasInteracted) {
+        targetMouse.x = Math.sin(elapsedTime * 0.25) * 0.5;
+        targetMouse.y = Math.cos(elapsedTime * 0.2) * 0.4;
+      }
+
       mouse.x += (targetMouse.x - mouse.x) * 0.16;
       mouse.y += (targetMouse.y - mouse.y) * 0.16;
 
-      // Project mouse into 3D Space
       raycaster.setFromCamera(mouse, camera);
       raycaster.ray.intersectPlane(plane, mouseWorldPos);
 
-      // Camera parallax
-      // CHANGED: 0.03 -> 0.14 so the camera doesn't add its own extra lag
-      // on top of the mouse catching up above.
       camera.position.x += (mouse.x * 3 - camera.position.x) * 0.14;
       camera.position.y += (mouse.y * 3 - camera.position.y) * 0.14;
       camera.lookAt(scene.position);
 
-      // Physics Update for Antigravity Nodes
       const posAttr = nodeGeom.attributes.position;
 
       for (let i = 0; i < NODE_COUNT; i++) {
         const n = nodes[i];
 
-        // 1. Antigravity Upward Drift
         n.y += n.vy;
 
-        // Reset if float out of upper boundary
         if (n.y > SPREAD_Y) {
           n.y = -SPREAD_Y;
           n.x = (Math.random() - 0.5) * SPREAD_X * 2;
         }
 
-        // 2. Harmonic Horizontal Wiggle (Zero-G drift)
         const waveX = Math.sin(elapsedTime * 0.8 + n.floatOffset) * 0.03;
         const waveZ = Math.cos(elapsedTime * 0.6 + n.floatOffset) * 0.02;
 
-        // 3. Mouse Repulsion Force Field
         const dx = n.x - mouseWorldPos.x;
         const dy = n.y - mouseWorldPos.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -204,7 +214,6 @@ export default function AntigravityBackground() {
           n.vy += (dy / dist) * force;
         }
 
-        // Apply velocities with damping/friction
         n.vx *= 0.92;
         n.x += n.vx + waveX;
         n.z += waveZ;
@@ -214,13 +223,11 @@ export default function AntigravityBackground() {
 
       posAttr.needsUpdate = true;
 
-      // Antigravity Gyro Rings Rotation
       outerRing.rotation.x = elapsedTime * 0.2;
       outerRing.rotation.y = elapsedTime * 0.3;
       innerRing.rotation.x = -elapsedTime * 0.4;
       innerRing.rotation.z = elapsedTime * 0.2;
 
-      // Vertical Floating Bob
       ringGroup.position.y = Math.sin(elapsedTime * 0.7) * 3;
 
       renderer.render(scene, camera);
@@ -231,6 +238,8 @@ export default function AntigravityBackground() {
     // Cleanup
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchstart', handleTouchMove);
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
       if (container.contains(renderer.domElement)) {

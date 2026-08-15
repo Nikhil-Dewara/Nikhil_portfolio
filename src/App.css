@@ -202,6 +202,8 @@ body::after {
 .island-brand {
   display: flex;
   flex-direction: column;
+  min-width: 0; /* NEW — flex children default to min-width:auto, which lets
+                   long unbroken text overflow instead of wrapping/clipping */
 }
 
 .brand-name {
@@ -210,6 +212,7 @@ body::after {
   font-size: 0.9rem;
   color: var(--text-main);
   line-height: 1.1;
+  white-space: nowrap; /* NEW — keeps the name on one line inside the island */
 }
 
 .brand-status {
@@ -471,6 +474,7 @@ body::after {
 .app-container {
   position: relative;
   min-height: 100vh;
+  overflow-x: hidden; /* NEW — safety net so no child can force horizontal scroll */
 }
 
 .content-wrapper {
@@ -479,6 +483,8 @@ body::after {
   max-width: 1200px;
   margin: 0 auto;
   padding: 120px 24px 140px;
+  overflow-wrap: break-word; /* NEW — long unbroken strings (emails, URLs, IDs)
+                                wrap instead of clipping/overflowing on narrow screens */
 }
 
 .section {
@@ -585,7 +591,11 @@ body::after {
   font-family: var(--font-heading);
   font-size: 5rem;
   font-weight: 700;
-  line-height: 0.98;
+  line-height: 1.05; /* CHANGED — was 0.98. That tight a line-height clips
+                        ascenders/descenders (e.g. the "N" cap-height and the
+                        comma-shaped tail on some glyphs) once font scaling
+                        kicks in on mobile. 1.05 keeps the tight look but
+                        stops the visual cutoff. */
   letter-spacing: -0.035em;
   margin-bottom: 16px;
   color: var(--text-main);
@@ -661,11 +671,13 @@ body::after {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border: none;
+  white-space: nowrap; /* NEW — prevents button label wrapping mid-word on narrow flex rows */
 }
 
 .btn svg {
   width: 17px;
   height: 17px;
+  flex-shrink: 0; /* NEW — icon keeps its size instead of being squeezed by long labels */
 }
 
 .btn-primary {
@@ -722,6 +734,7 @@ body::after {
   padding: 12px 16px;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* NEW — lets stat-num wrap/shrink instead of overflowing the pill */
 }
 
 .stat-num {
@@ -729,6 +742,7 @@ body::after {
   font-size: 1rem;
   font-weight: 700;
   color: var(--accent-blue);
+  overflow-wrap: break-word; /* NEW */
 }
 
 .stat-label {
@@ -816,6 +830,7 @@ body::after {
   width: 16px;
   height: 16px;
   color: var(--accent-blue);
+  flex-shrink: 0; /* NEW */
 }
 
 /* ==========================================================================
@@ -1020,6 +1035,7 @@ body::after {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  gap: 10px; /* NEW — prevents the status pill from touching/overlapping the logo on narrow cards */
 }
 
 .company-logo-container {
@@ -1033,6 +1049,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* NEW */
 }
 
 .company-logo-img {
@@ -1063,6 +1080,8 @@ body::after {
   border: 1px solid rgba(22, 163, 74, 0.3);
   padding: 4px 10px;
   border-radius: 6px;
+  white-space: nowrap; /* NEW */
+  flex-shrink: 0; /* NEW */
 }
 
 .timeline-dates {
@@ -1078,6 +1097,7 @@ body::after {
   font-size: 1.35rem;
   font-weight: 700;
   color: var(--text-main);
+  overflow-wrap: break-word; /* NEW — long role titles wrap instead of overflowing the fixed-width card */
 }
 
 .exp-company {
@@ -1085,6 +1105,7 @@ body::after {
   color: var(--accent-blue);
   font-weight: 700;
   margin-bottom: 16px;
+  overflow-wrap: break-word; /* NEW */
 }
 
 .exp-bullet-list {
@@ -1137,6 +1158,7 @@ body::after {
   border: 1px solid var(--glass-border);
   padding: 4px 11px;
   border-radius: 6px;
+  white-space: nowrap; /* NEW — keeps tag chips from wrapping into two lines and breaking row height */
 }
 
 .tag--muted {
@@ -1167,6 +1189,7 @@ body::after {
   border-radius: 7px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap; /* NEW */
 }
 
 .tab-btn.active {
@@ -1198,11 +1221,13 @@ body::after {
   justify-content: space-between;
   margin-bottom: 16px;
   flex-shrink: 0;
+  gap: 10px; /* NEW */
 }
 
 .window-dots {
   display: flex;
   gap: 6px;
+  flex-shrink: 0; /* NEW */
 }
 
 .dot {
@@ -1224,6 +1249,7 @@ body::after {
   border: 1px solid rgba(58, 92, 255, 0.3);
   padding: 3px 9px;
   border-radius: 6px;
+  white-space: nowrap; /* NEW */
 }
 
 .card-title {
@@ -1240,6 +1266,7 @@ body::after {
   -webkit-box-orient: vertical;
   overflow: hidden;
   min-height: calc(1.25em * 2);
+  overflow-wrap: break-word; /* NEW */
 }
 
 .card-desc {
@@ -1254,6 +1281,7 @@ body::after {
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  overflow-wrap: break-word; /* NEW */
 }
 
 .card-bottom-actions {
@@ -1264,6 +1292,8 @@ body::after {
   padding-top: 16px;
   border-top: 1px solid var(--glass-border);
   flex-shrink: 0;
+  gap: 10px; /* NEW — keeps the two buttons from crushing into each other on narrow cards */
+  flex-wrap: wrap; /* NEW */
 }
 
 .section-subtitle-box {
@@ -1327,12 +1357,14 @@ body::after {
   font-weight: 700;
   color: var(--text-main);
   margin-bottom: 6px;
+  overflow-wrap: break-word; /* NEW — long degree names wrap on narrow cards */
 }
 
 .edu-school {
   font-size: 0.94rem;
   color: var(--text-sub);
   margin-bottom: 4px;
+  overflow-wrap: break-word; /* NEW */
 }
 
 .edu-meta {
@@ -1354,6 +1386,7 @@ body::after {
   padding-left: 18px;
   font-size: 0.92rem;
   color: var(--text-sub);
+  overflow-wrap: break-word; /* NEW */
 }
 
 .achievement-list li::before {
@@ -1379,6 +1412,7 @@ body::after {
   border: 1px solid var(--glass-border);
   padding: 4px 11px;
   border-radius: 6px;
+  white-space: nowrap; /* NEW */
 }
 
 /* ==========================================================================
@@ -1402,6 +1436,10 @@ body::after {
   color: var(--text-main);
   margin-bottom: 12px;
   letter-spacing: -0.02em;
+  line-height: 1.15; /* NEW — footer-title has no explicit line-height, so it
+                         inherits body's 1.6, which is fine, but this keeps
+                         the wrapped 2-line version ("Let's build / something
+                         extraordinary") from feeling loose on small screens */
 }
 
 .footer-sub {
@@ -1430,6 +1468,7 @@ body::after {
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: left;
+  min-width: 0; /* NEW */
 }
 
 .contact-item-btn:hover {
@@ -1447,6 +1486,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; /* NEW — keeps the icon circle from getting squashed when contact-val is long */
 }
 
 .contact-icon svg {
@@ -1458,6 +1498,9 @@ body::after {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  min-width: 0; /* NEW — THE key fix: flex items default to min-width:auto,
+                   which is exactly why nikdewara@gmail.com / the LinkedIn
+                   handle were getting clipped instead of wrapping */
 }
 
 .contact-label {
@@ -1469,6 +1512,8 @@ body::after {
   font-weight: 700;
   font-size: 0.94rem;
   color: var(--text-main);
+  overflow-wrap: break-word; /* NEW */
+  word-break: break-word;    /* NEW — extra safety for unbroken strings like emails on very narrow screens */
 }
 
 .copy-badge {
@@ -1478,12 +1523,15 @@ body::after {
   background: rgba(58, 92, 255, 0.08);
   padding: 4px 9px;
   border-radius: 6px;
+  white-space: nowrap; /* NEW */
+  flex-shrink: 0; /* NEW */
 }
 
 .nav-arrow {
   color: var(--text-muted);
   width: 16px;
   height: 16px;
+  flex-shrink: 0; /* NEW */
 }
 
 .footer-bottom {
@@ -1521,6 +1569,7 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px; /* NEW — so the loader card never touches viewport edges on tiny screens */
 }
 
 .loader-card {
@@ -1530,6 +1579,7 @@ body::after {
   flex-direction: column;
   align-items: center;
   max-width: 420px;
+  width: 100%; /* NEW — lets it shrink to fit narrow viewports instead of overflowing */
 }
 
 .apple-logo-badge {
@@ -1542,6 +1592,7 @@ body::after {
   margin-bottom: 16px;
   box-shadow: 0 10px 22px rgba(96, 96, 99, 0.35);
   overflow: hidden; /* Keeps image bounds contained within border-radius */
+  flex-shrink: 0; /* NEW */
 }
 
 /* Image styling */
@@ -1565,6 +1616,8 @@ body::after {
   font-size: 0.85rem;
   color: var(--text-muted);
   margin-bottom: 24px;
+  overflow-wrap: break-word; /* NEW — the "$ initializing_portfolio --env=production" string
+                                 is long and monospace; wraps instead of overflowing at ~340px */
 }
 
 .loader-bar-bg {
@@ -1632,11 +1685,13 @@ body::after {
   height: 7px;
   border-radius: 50%;
   background: var(--accent-blue);
+  flex-shrink: 0; /* NEW */
 }
 
 .code-body {
   padding: 20px 22px 24px;
   flex: 1;
+  min-width: 0; /* NEW */
 }
 
 .code-line {
@@ -1658,6 +1713,8 @@ body::after {
 
 .code-content {
   flex: 1;
+  min-width: 0; /* NEW — this is what let long .code-prose sentences push the
+                   line-number gutter around / overflow the card horizontally */
 }
 
 .code-comment {
@@ -1673,6 +1730,7 @@ body::after {
   color: var(--text-sub);
   line-height: 1.75;
   padding-bottom: 4px;
+  overflow-wrap: break-word; /* NEW */
 }
 
 .code-prose strong {
@@ -1711,6 +1769,7 @@ body::after {
   padding: 3px 9px;
   border-radius: 5px;
   transition: all 0.18s ease;
+  white-space: nowrap; /* NEW */
 }
 
 .code-string:hover {
@@ -1797,6 +1856,12 @@ body::after {
   .standard-project-grid {
     grid-template-columns: 1fr;
   }
+  .standard-project-card {
+    height: auto;      /* NEW — was a hard 320px; on narrow columns, wrapped
+                           text needs more vertical room than desktop's 2-col
+                           layout ever required, so let it grow */
+    min-height: 300px; /* NEW — keeps a consistent minimum footprint */
+  }
   .hero-stats-row {
     flex-direction: column;
   }
@@ -1847,12 +1912,40 @@ body::after {
   .dock-item::after {
     display: none;
   }
+
+  /* NEW — code panes: give the profile.md / skills.json cards a bit more
+     breathing room so wrapped prose and skill-tag chips don't crowd the
+     card edge or push past the line-number gutter */
+  .code-body {
+    padding: 16px;
+  }
+  .code-prose {
+    font-size: 0.95rem;
+  }
+  .code-array {
+    margin-left: 0; /* was 20px, indenting tags close enough to the edge
+                        to visually clip on 360–375px screens */
+  }
+
+  /* NEW — contact cards: stack icon+text more comfortably and let the
+     email/handle wrap onto a second line cleanly instead of being cramped
+     against the copy/arrow icon */
+  .contact-item-btn {
+    align-items: flex-start;
+  }
+  .contact-val {
+    font-size: 0.88rem;
+  }
 }
 
 /* Small phone */
 @media (max-width: 400px) {
   .hero-name {
-    font-size: 2.2rem;
+    font-size: 1.9rem; /* CHANGED — was 2.2rem, still tight against the
+                           -0.035em letter-spacing at this width */
+    letter-spacing: -0.02em; /* CHANGED — was -0.035em; less aggressive
+                                 negative tracking avoids letters/descenders
+                                 crowding into each other at small sizes */
   }
   .hero-avatar-card {
     max-width: 220px;
@@ -1870,11 +1963,15 @@ body::after {
     gap: 12px;
   }
   .footer-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem; /* CHANGED — was 1.8rem, tightened further to match
+                           the hero-name adjustment above */
   }
   .dock-item {
     width: 34px;
     height: 34px;
+  }
+  .exp-role {
+    font-size: 1.15rem; /* NEW — 1.35rem was tight against the 86vw card width */
   }
 }
 
